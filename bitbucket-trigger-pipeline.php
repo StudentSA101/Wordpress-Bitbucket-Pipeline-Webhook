@@ -39,8 +39,7 @@ function check_if_is_admin()
 
 function publish_static_hook_development()
 {
-  var_dump('Development has been triggered');
-  die('here');
+
   $bitbucket_project = get_option('option_project_development');
   $bitbucket_branch = get_option('option_branch_development');
   $bitbucket_username = get_option('option_username_development');
@@ -55,24 +54,34 @@ function publish_static_hook_development()
         'ref_name' => $bitbucket_branch
       )
     );
-    $response = wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/pipelines/', array(
-      'body' => json_encode($data),
-      'headers' => array(
-        'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
-        'Content-Type' => 'application/json'
-      ),
-    ));
-    // for debugging
-    // echo '<pre>https://api.bitbucket.org/2.0/repositories/'.$bitbucket_project.'/pipelines</pre>';
-    // echo '<pre>'.print_r($data, true).'</pre>';
-    // echo '<pre>'.print_r($response, true).'</pre>';
+    $checkPipelineStatus = wp_remote_get(
+      'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/?sort=-created_on',
+      array(
+        'headers' => array(
+          'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
+          'Content-Type' => 'application/json'
+        ),
+      )
+
+    );
+    $formatData = json_decode($checkPipelineStatus['body'], true);
+    if (strtoupper($formatData['values'][0]['state']['name']) !== 'IN_PROGRESS') {
+      wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/', array(
+        'body' => json_encode($data),
+        'headers' => array(
+          'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
+          'Content-Type' => 'application/json'
+        ),
+      ));
+      echo 'Pipeline has been triggered';
+    }
+    echo 'Pipeline is still in progress, please wait.';
   }
 }
 if (check_if_is_admin()) {
   function publish_static_hook_production()
   {
-    var_dump('Production has been triggered');
-    die('here');
+
     $bitbucket_project = get_option('option_project_production');
     $bitbucket_branch = get_option('option_branch_production');
     $bitbucket_username = get_option('option_username_production');
@@ -87,17 +96,29 @@ if (check_if_is_admin()) {
           'ref_name' => $bitbucket_branch
         )
       );
-      $response = wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/pipelines/', array(
-        'body' => json_encode($data),
-        'headers' => array(
-          'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
-          'Content-Type' => 'application/json'
-        ),
-      ));
-      // for debugging
-      // echo '<pre>https://api.bitbucket.org/2.0/repositories/'.$bitbucket_project.'/pipelines</pre>';
-      // echo '<pre>'.print_r($data, true).'</pre>';
-      // echo '<pre>'.print_r($response, true).'</pre>';
+
+      $checkPipelineStatus = wp_remote_get(
+        'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/?sort=-created_on',
+        array(
+          'headers' => array(
+            'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
+            'Content-Type' => 'application/json'
+          ),
+        )
+      );
+
+      $formatData = json_decode($checkPipelineStatus['body'], true);
+      if (strtoupper($formatData['values'][0]['state']['name']) !== 'IN_PROGRESS') {
+        wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/pipelines/', array(
+          'body' => json_encode($data),
+          'headers' => array(
+            'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
+            'Content-Type' => 'application/json'
+          ),
+        ));
+        echo 'Pipeline has been triggered';
+      }
+      echo 'Pipeline is still in progress, please wait.';
     }
   }
 }
