@@ -55,7 +55,7 @@ function publish_static_hook_development()
       )
     );
     $checkPipelineStatus = wp_remote_get(
-      'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/?sort=-created_on',
+      'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/<reponame>/pipelines/?sort=-created_on',
       array(
         'headers' => array(
           'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
@@ -66,7 +66,7 @@ function publish_static_hook_development()
     );
     $formatData = json_decode($checkPipelineStatus['body'], true);
     if (strtoupper($formatData['values'][0]['state']['name']) !== 'IN_PROGRESS') {
-      wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/', array(
+      wp_remote_post('https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/<reponame>/pipelines/', array(
         'body' => json_encode($data),
         'headers' => array(
           'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
@@ -98,7 +98,7 @@ if (check_if_is_admin()) {
       );
 
       $checkPipelineStatus = wp_remote_get(
-        'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/dotsure-static-blog/pipelines/?sort=-created_on',
+        'https://api.bitbucket.org/2.0/repositories/' . $bitbucket_project . '/<reponame>/pipelines/?sort=-created_on',
         array(
           'headers' => array(
             'Authorization' => 'Basic ' . base64_encode($bitbucket_username . ':' . $bitbucket_app_password),
