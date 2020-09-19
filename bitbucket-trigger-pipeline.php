@@ -1,13 +1,9 @@
 <?php
 /*
 Plugin Name: BitBucket Trigger Pipeline
-Plugin URI: https://github.com/kmturley/wordpress-bitbucket-trigger-pipeline
 Description: Wordpress Plugin triggers a BitBucket Pipeline when user publishes a post (using environment variables BITBUCKET_PROJECT, BITBUCKET_USERNAME and BITBUCKET_PASSWORD)
 Version: 0.1
-Author: Kim T
-Author URI: https://github.com/kmturley
-License: GPL
-Copyright: Kim T
+Author: Pierre
 */
 
 
